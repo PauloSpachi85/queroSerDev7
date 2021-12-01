@@ -8,10 +8,6 @@ SEARCH = 3
 MARK_AS_DONE = 4
 EXIT = 5
 
-def welcome
-	'Boas vindas ao Diário de Estudos :D'
-end
-
 def menu
 	puts <<~Menu 
 		------------------------------------------
@@ -80,7 +76,7 @@ def search_study_items(collection)
 end
 
 clear
-puts welcome
+puts 'Boas vindas ao Diário de Estudos :D'
 
 study_items = []
 option = menu
@@ -89,27 +85,22 @@ loop do
 	case option
 	when INSERT
 		study_items << create_study_item
-		wait_and_clear
 	when VIEW_ALL
 		print_study_items(study_items)
-		wait_and_clear
 	when SEARCH
 		found_items = search_study_items(study_items)
 		print_study_items(found_items)
-		wait_and_clear
 	# elsif option == 4
 	# elsif option == 5
 	# elsif option == 6
 	when MARK_AS_DONE
 		mark_study_items_as_done(study_items)
-		wait_and_clear
 	when EXIT
 		break
 	else
 		puts 'Opção inválida'
-		wait_and_clear
 	end
-	clear
+	wait_and_clear
 	option = menu
 end
 puts 'Obrigado por usar o Diário de Estudos :D'

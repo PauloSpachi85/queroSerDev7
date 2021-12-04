@@ -1,4 +1,6 @@
 require 'io/console'
+require_relative 'study_item'
+
 INSERT = 1
 VIEW_ALL = 2
 SEARCH = 3
@@ -22,27 +24,9 @@ def menu
 	gets.to_i
 end
 
-def create_study_item
-	print 'O que você quer estudar? '
-	title = gets.chomp
-
-	print 'A qual categoria esse item pertence? '
-	category = gets.chomp
-
-	puts "O estudo de #{title} foi cadastrado com sucesso na categoria #{category}"
-	{title: title, category: category, done: false}
-end
-
-def mark_study_items_as_done(study_items)
-	not_finalized = study_items.filter { |item| !item[:done] }
-	print_study_items(not_finalized)
-	return if not_finalized.empty?
-
-	puts
-	print 'Digite o número que deseja finalizar: '
-	index = gets.to_i
-	not_finalized[index - 1][:done] = true
-	
+def print_with_index(collection)
+	puts collection
+	puts 'Nenhum item encontrado' if collection.empty?
 end
 
 def clear
@@ -60,41 +44,43 @@ def wait_and_clear
 	clear
 end
 
-def print_study_items(collection)
-	collection.each.with_index(1) do |item, index|
-		puts "##{index} - #{item[:title]} - #{item[:category]}#{' - Finalizada' if item[:done]}"
-	end
-	puts 'Nenhum item encontrado' if collection.empty?
-end
-
-def search_study_items(collection)
+def search_study_items
 	print 'Digite uma palavra para procurar: '
 	term = gets.chomp
-	collection.filter do |item|
-		item[:title].include? term
-	end
+	StudyItem.search(term)
 end
+
+def mark_study_items_as_done
+	not_finalized = StudyItem.undone
+	print_with_index(not_finalized)
+	return if not_finalized.empty?
+
+	puts
+	print 'Digite o número que deseja finalizar: '
+	index = gets.to_i
+	not_finalized[index - 1].done!
+end
+
 
 clear
 puts 'Boas vindas ao Diário de Estudos :D'
 
-study_items = []
 option = menu
 
 loop do
 	case option
 	when INSERT
-		study_items << create_study_item
+		StudyItem.create
 	when VIEW_ALL
-		print_study_items(study_items)
+		print_with_index(StudyItem.all)
 	when SEARCH
-		found_items = search_study_items(study_items)
-		print_study_items(found_items)
+		found_items = search_study_items
+		print_with_index(found_items)
 	# elsif option == 4
 	# elsif option == 5
 	# elsif option == 6
 	when MARK_AS_DONE
-		mark_study_items_as_done(study_items)
+		mark_study_items_as_done
 	when EXIT
 		break
 	else
